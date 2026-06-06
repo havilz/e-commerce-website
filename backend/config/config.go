@@ -13,6 +13,7 @@ type Config struct {
 	DBPath         string
 	JWTSecret      string
 	JWTExpiryHours int
+	AllowedOrigins string
 }
 
 func Load() *Config {
@@ -53,6 +54,7 @@ func Load() *Config {
 		DBPath:         dbPath,
 		JWTSecret:      getEnv("JWT_SECRET", "default-secret-change-me"),
 		JWTExpiryHours: expiryHours,
+		AllowedOrigins: getEnv("ALLOWED_ORIGINS", "http://localhost:5173"),
 	}
 }
 

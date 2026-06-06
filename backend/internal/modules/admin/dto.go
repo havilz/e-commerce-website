@@ -39,9 +39,16 @@ type AdminOrderItemResponse struct {
 	PriceAtPurchase float64           `json:"price_at_purchase"`
 }
 
+type AdminOrderUser struct {
+	ID    uint   `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
 type AdminOrderResponse struct {
 	ID         uint                     `json:"id"`
 	UserID     uint                     `json:"user_id"`
+	User       AdminOrderUser           `json:"user"`
 	TotalPrice float64                  `json:"total_price"`
 	Status     string                   `json:"status"`
 	Address    string                   `json:"address"`

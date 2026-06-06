@@ -107,8 +107,13 @@ func (s *service) GetAllOrders(page, limit int) ([]AdminOrderResponse, int64, er
 			items = []AdminOrderItemResponse{}
 		}
 		result = append(result, AdminOrderResponse{
-			ID:         o.ID,
-			UserID:     o.UserID,
+			ID:     o.ID,
+			UserID: o.UserID,
+			User: AdminOrderUser{
+				ID:    o.User.ID,
+				Name:  o.User.Name,
+				Email: o.User.Email,
+			},
 			TotalPrice: o.TotalPrice,
 			Status:     o.Status,
 			Address:    o.Address,

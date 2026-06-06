@@ -137,7 +137,8 @@ func main() {
 	//Start server
 	addr := ":" + cfg.Port
 	log.Printf("[server] running on http://localhost%s", addr)
-	if err := http.ListenAndServe(addr, mux); err != nil {
+	corsHandler := middleware.CORSMiddleware(cfg.AllowedOrigins)
+	if err := http.ListenAndServe(addr, corsHandler(mux)); err != nil {
 		log.Fatalf("[server] failed to start: %v", err)
 	}
 }
