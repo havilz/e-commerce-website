@@ -69,6 +69,21 @@ func main() {
 	// Router
 	mux := http.NewServeMux()
 
+	// Root Landing Route
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"message": "E-Commerce API is running. Visit /swagger/index.html for API documentation."}`))
+	})
+
+	// Swagger Redirect Route
+	mux.HandleFunc("GET /swagger", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/swagger/index.html", http.StatusMovedPermanently)
+	})
+
 	// Swagger Route
 	mux.Handle("GET /swagger/", httpSwagger.Handler(
 		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),

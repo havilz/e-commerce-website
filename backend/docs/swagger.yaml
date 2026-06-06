@@ -1,0 +1,913 @@
+basePath: /api/v1
+definitions:
+  admin.AdminOrderItemResponse:
+    properties:
+      id:
+        type: integer
+      price_at_purchase:
+        type: number
+      product:
+        $ref: '#/definitions/admin.AdminOrderProduct'
+      quantity:
+        type: integer
+    type: object
+  admin.AdminOrderProduct:
+    properties:
+      id:
+        type: integer
+      image_url:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  admin.AdminOrderResponse:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/admin.AdminOrderItemResponse'
+        type: array
+      status:
+        type: string
+      total_price:
+        type: number
+      user_id:
+        type: integer
+    type: object
+  admin.AdminProductRequest:
+    properties:
+      category:
+        type: string
+      description:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      stock:
+        type: integer
+    type: object
+  admin.AdminProductResponse:
+    properties:
+      category:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      stock:
+        type: integer
+    type: object
+  admin.UpdateOrderStatusRequest:
+    properties:
+      status:
+        type: string
+    type: object
+  auth.AuthResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/auth.UserData'
+    type: object
+  auth.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  auth.MeResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      role:
+        type: string
+    type: object
+  auth.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  auth.UserData:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      role:
+        type: string
+    type: object
+  cart.AddCartRequest:
+    properties:
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  cart.CartItemResponse:
+    properties:
+      id:
+        type: integer
+      product:
+        $ref: '#/definitions/cart.Product'
+      quantity:
+        type: integer
+    type: object
+  cart.CartResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/cart.CartItemResponse'
+        type: array
+      total_items:
+        type: integer
+    type: object
+  cart.Product:
+    properties:
+      category:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      stock:
+        type: integer
+    type: object
+  cart.UpdateCartRequest:
+    properties:
+      quantity:
+        type: integer
+    type: object
+  order.CheckoutRequest:
+    properties:
+      address:
+        type: string
+    type: object
+  order.OrderItemResponse:
+    properties:
+      id:
+        type: integer
+      price_at_purchase:
+        type: number
+      product:
+        $ref: '#/definitions/order.OrderProduct'
+      quantity:
+        type: integer
+    type: object
+  order.OrderProduct:
+    properties:
+      category:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  order.OrderResponse:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/order.OrderItemResponse'
+        type: array
+      status:
+        type: string
+      total_price:
+        type: number
+    type: object
+  product.ProductResponse:
+    properties:
+      category:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      stock:
+        type: integer
+    type: object
+  response.JSONResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  response.PaginationMeta:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  response.PaginationResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      meta:
+        $ref: '#/definitions/response.PaginationMeta'
+      success:
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@ecommerce.com
+    name: API Support
+  description: API Server for E-Commerce Platform built with native Go, GORM, SQLite,
+    and JWT.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: E-Commerce API
+  version: "1.0"
+paths:
+  /admin/orders:
+    get:
+      description: Retrieve a paginated list of all customer orders in the system
+        (Admin Only)
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Page size (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PaginationResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/admin.AdminOrderResponse'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all orders
+      tags:
+      - admin
+  /admin/orders/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Update the delivery status of a client's order (Admin Only)
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Status Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/admin.UpdateOrderStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Update order status
+      tags:
+      - admin
+  /admin/products:
+    post:
+      consumes:
+      - application/json
+      description: Add a new product to the catalog (Admin Only)
+      parameters:
+      - description: Create Product Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/admin.AdminProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/admin.AdminProductResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new product
+      tags:
+      - admin
+  /admin/products/{id}:
+    delete:
+      description: Delete a product from the database (Admin Only)
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a product
+      tags:
+      - admin
+    put:
+      consumes:
+      - application/json
+      description: Update the details of an existing product (Admin Only)
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Product Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/admin.AdminProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a product
+      tags:
+      - admin
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user credentials and return a JWT token
+      parameters:
+      - description: Login Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.AuthResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      summary: User Login
+      tags:
+      - auth
+  /auth/me:
+    get:
+      description: Retrieve the profile info of the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.MeResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user profile
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with default role "user"
+      parameters:
+      - description: Register Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.MeResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      summary: Register a new user
+      tags:
+      - auth
+  /cart:
+    delete:
+      description: Remove all items from the authenticated user's shopping cart
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Clear shopping cart
+      tags:
+      - cart
+    get:
+      description: Retrieve the current items and summary of the authenticated user's
+        cart
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/cart.CartResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user cart
+      tags:
+      - cart
+    post:
+      consumes:
+      - application/json
+      description: Add a specified quantity of a product to the user's shopping cart
+      parameters:
+      - description: Add Cart Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/cart.AddCartRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Add item to cart
+      tags:
+      - cart
+  /cart/{id}:
+    delete:
+      description: Remove a single item from the user's shopping cart by item ID
+      parameters:
+      - description: Cart Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Remove item from cart
+      tags:
+      - cart
+    put:
+      consumes:
+      - application/json
+      description: Update the quantity of a specific item in the shopping cart
+      parameters:
+      - description: Cart Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Quantity Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/cart.UpdateCartRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Update cart item quantity
+      tags:
+      - cart
+  /orders:
+    get:
+      description: Retrieve the order purchase history of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.JSONResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/order.OrderResponse'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user orders
+      tags:
+      - orders
+  /orders/{id}:
+    get:
+      description: Retrieve the details of a specific order by order ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/order.OrderResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Get order by ID
+      tags:
+      - orders
+  /orders/checkout:
+    post:
+      consumes:
+      - application/json
+      description: Create an order from the user's current shopping cart and clear
+        the cart
+      parameters:
+      - description: Checkout Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/order.CheckoutRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/order.OrderResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Checkout shopping cart
+      tags:
+      - orders
+  /products:
+    get:
+      description: Retrieve products with optional filtering by search term or category,
+        with pagination
+      parameters:
+      - description: Search by product name/description
+        in: query
+        name: search
+        type: string
+      - description: Filter by category
+        in: query
+        name: category
+        type: string
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Page size (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PaginationResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/product.ProductResponse'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      summary: Get all products
+      tags:
+      - products
+  /products/{id}:
+    get:
+      description: Retrieve a single product by its unique database ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/product.ProductResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      summary: Get product by ID
+      tags:
+      - products
+securityDefinitions:
+  BearerAuth:
+    description: 'Insert JWT token in format: Bearer <token>'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
