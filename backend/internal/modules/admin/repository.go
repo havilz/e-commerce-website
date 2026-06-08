@@ -11,6 +11,8 @@ type Repository interface {
 	DeleteProduct(id uint) error
 	FindAllOrders(page, limit int) ([]models.Order, int64, error)
 	UpdateOrderStatus(orderID uint, status string) error
+	FindCategoryByName(name string) (*models.Category, error)
+	FindCategoryByID(id uint) (*models.Category, error)
 }
 
 type repository struct {
@@ -41,7 +43,7 @@ func (r *repository) FindAllOrders(page, limit int) ([]models.Order, int64, erro
 
 	offset := (page - 1) * limit
 	err := r.db.
-		Preload("Items.Product").
+		Preload("Items.Product.Category").
 		Preload("User").
 		Order("created_at DESC").
 		Offset(offset).Limit(limit).
@@ -53,4 +55,20 @@ func (r *repository) FindAllOrders(page, limit int) ([]models.Order, int64, erro
 func (r *repository) UpdateOrderStatus(orderID uint, status string) error {
 	return r.db.Model(&models.Order{}).Where("id = ?", orderID).
 		UpdateColumn("status", status).Error
+}
+
+func (r *repository) FindCategoryByName(name string) (*models.Category, error) {
+	var cat models.Category
+	if err := r.db.Where("name = ?", name).First(&cat).Error; err != nil {
+		return nil, err
+	}
+	return &cat, nil
+}
+
+func (r *repository) FindCategoryByID(id uint) (*models.Category, error) {
+	var cat models.Category
+	if err := r.db.First(&cat, id).Error; err != nil {
+		return nil, err
+	}
+	return &cat, nil
 }

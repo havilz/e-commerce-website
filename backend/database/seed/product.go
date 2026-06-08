@@ -8,12 +8,24 @@ import (
 	"gorm.io/gorm"
 )
 
-func SeedProducts(db *gorm.DB) {
+func SeedProducts(db *gorm.DB, cats []models.Category) {
 	var count int64
 	db.Model(&models.Product{}).Count(&count)
 	if count > 0 {
 		log.Println("[seed] products already exist, skipping...")
 		return
+	}
+
+	getCatID := func(name string) uint {
+		for _, cat := range cats {
+			if cat.Name == name {
+				return cat.ID
+			}
+		}
+		if len(cats) > 0 {
+			return cats[0].ID
+		}
+		return 1
 	}
 
 	products := []models.Product{
@@ -23,7 +35,7 @@ func SeedProducts(db *gorm.DB) {
 			Price:       999000,
 			Stock:       50,
 			ImageURL:    "https://picsum.photos/seed/1/400/400",
-			Category:    "Electronics",
+			CategoryID:  getCatID("Electronics"),
 		},
 		{
 			Name:        "Mechanical Keyboard",
@@ -31,7 +43,7 @@ func SeedProducts(db *gorm.DB) {
 			Price:       750000,
 			Stock:       30,
 			ImageURL:    "https://picsum.photos/seed/2/400/400",
-			Category:    "Electronics",
+			CategoryID:  getCatID("Electronics"),
 		},
 		{
 			Name:        "Running Shoes",
@@ -39,7 +51,7 @@ func SeedProducts(db *gorm.DB) {
 			Price:       650000,
 			Stock:       100,
 			ImageURL:    "https://picsum.photos/seed/3/400/400",
-			Category:    "Fashion",
+			CategoryID:  getCatID("Fashion"),
 		},
 		{
 			Name:        "Stainless Water Bottle",
@@ -47,7 +59,7 @@ func SeedProducts(db *gorm.DB) {
 			Price:       120000,
 			Stock:       200,
 			ImageURL:    "https://picsum.photos/seed/4/400/400",
-			Category:    "Lifestyle",
+			CategoryID:  getCatID("Lifestyle"),
 		},
 		{
 			Name:        "Backpack 30L",
@@ -55,7 +67,7 @@ func SeedProducts(db *gorm.DB) {
 			Price:       450000,
 			Stock:       75,
 			ImageURL:    "https://picsum.photos/seed/5/400/400",
-			Category:    "Fashion",
+			CategoryID:  getCatID("Fashion"),
 		},
 	}
 
@@ -99,13 +111,14 @@ func SeedProducts(db *gorm.DB) {
 	}
 
 	for i, name := range names {
+		catName := categories[i%len(categories)]
 		products = append(products, models.Product{
 			Name:        name,
 			Description: fmt.Sprintf("%s - high quality product for everyday use", name),
 			Price:       float64(100000 + ((i + 1) * 25000)),
 			Stock:       20 + (i % 100),
 			ImageURL:    fmt.Sprintf("https://picsum.photos/seed/product%d/400/400", i+6),
-			Category:    categories[i%len(categories)],
+			CategoryID:  getCatID(catName),
 		})
 	}
 

@@ -25,7 +25,7 @@ func NewRepository(db *gorm.DB) Repository {
 
 func (r *repository) FindByUserID(userID uint) ([]models.CartItem, error) {
 	var items []models.CartItem
-	if err := r.db.Preload("Product").Where("user_id = ?", userID).Find(&items).Error; err != nil {
+	if err := r.db.Preload("Product.Category").Where("user_id = ?", userID).Find(&items).Error; err != nil {
 		return nil, err
 	}
 	return items, nil
@@ -33,7 +33,7 @@ func (r *repository) FindByUserID(userID uint) ([]models.CartItem, error) {
 
 func (r *repository) FindItemByID(itemID, userID uint) (*models.CartItem, error) {
 	var item models.CartItem
-	if err := r.db.Preload("Product").Where("id = ? AND user_id = ?", itemID, userID).First(&item).Error; err != nil {
+	if err := r.db.Preload("Product.Category").Where("id = ? AND user_id = ?", itemID, userID).First(&item).Error; err != nil {
 		return nil, err
 	}
 	return &item, nil

@@ -34,7 +34,7 @@
         aria-label="Filter kategori"
       >
         <option value="">Semua Kategori</option>
-        <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+        <option v-for="cat in categories" :key="cat.id" :value="cat.name">{{ cat.name }}</option>
       </select>
 
       <!-- Clear filter -->
@@ -98,16 +98,17 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Search, X, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { useProducts } from '@/composables/useProducts'
-import ProductGrid from '@/components/product/ProductGrid.vue'
-import BaseButton  from '@/components/ui/BaseButton.vue'
+import ProductGrid     from '@/components/product/ProductGrid.vue'
+import BaseButton      from '@/components/ui/BaseButton.vue'
+import categoryService from '@/services/category.service'
 
 const route  = useRoute()
 const router = useRouter()
 
 const { products, loading, filters, pagination, fetchAll, filterByCategory, changePage, search } = useProducts()
 
-const categories = ['Electronics', 'Fashion', 'Lifestyle', 'Home', 'Sports', 'Books', 'Beauty', 'Gaming']
-const localSearch  = ref('')
+const categories    = ref([])
+const localSearch   = ref('')
 const localCategory = ref('')
 
 const totalPages = computed(() => Math.ceil(pagination.total / pagination.limit) || 1)
@@ -138,6 +139,13 @@ function clearFilters() {
 }
 
 onMounted(() => {
+  // Fetch kategori dari API
+  categoryService.getAll().then((res) => {
+    categories.value = res.data || []
+  }).catch(() => {
+    categories.value = []
+  })
+
   // Read query params from URL
   localSearch.value   = route.query.search   ? String(route.query.search)   : ''
   localCategory.value = route.query.category ? String(route.query.category) : ''

@@ -145,7 +145,7 @@ func toOrderResponse(o *models.Order) *OrderResponse {
 				Name:     item.Product.Name,
 				Price:    item.Product.Price,
 				ImageURL: item.Product.ImageURL,
-				Category: item.Product.Category,
+				Category: item.Product.Category.Name,
 			},
 			Quantity:        item.Quantity,
 			PriceAtPurchase: item.PriceAtPurchase,
