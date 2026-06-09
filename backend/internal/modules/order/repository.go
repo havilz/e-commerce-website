@@ -26,7 +26,7 @@ func (r *repository) CreateOrder(order *models.Order) error {
 func (r *repository) FindByUserID(userID uint) ([]models.Order, error) {
 	var orders []models.Order
 	err := r.db.
-		Preload("Items.Product").
+		Preload("Items.Product.Category").
 		Where("user_id = ?", userID).
 		Order("created_at DESC").
 		Find(&orders).Error
@@ -36,7 +36,7 @@ func (r *repository) FindByUserID(userID uint) ([]models.Order, error) {
 func (r *repository) FindByID(orderID, userID uint) (*models.Order, error) {
 	var order models.Order
 	err := r.db.
-		Preload("Items.Product").
+		Preload("Items.Product.Category").
 		Where("id = ? AND user_id = ?", orderID, userID).
 		First(&order).Error
 	if err != nil {

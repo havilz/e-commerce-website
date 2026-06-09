@@ -12,9 +12,10 @@ const Checkout       = () => import('@/pages/Checkout.vue')
 const OrderSuccess   = () => import('@/pages/OrderSuccess.vue')
 const Orders         = () => import('@/pages/Orders.vue')
 const OrderDetail    = () => import('@/pages/OrderDetail.vue')
-const AdminDashboard = () => import('@/pages/admin/AdminDashboard.vue')
-const AdminProducts  = () => import('@/pages/admin/AdminProducts.vue')
-const AdminOrders    = () => import('@/pages/admin/AdminOrders.vue')
+const AdminDashboard   = () => import('@/pages/admin/AdminDashboard.vue')
+const AdminProducts    = () => import('@/pages/admin/AdminProducts.vue')
+const AdminOrders      = () => import('@/pages/admin/AdminOrders.vue')
+const AdminCategories  = () => import('@/pages/admin/AdminCategories.vue')
 
 const routes = [
   // Public
@@ -73,6 +74,12 @@ const routes = [
     path: '/admin/orders',
     name: 'AdminOrders',
     component: AdminOrders,
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/admin/categories',
+    name: 'AdminCategories',
+    component: AdminCategories,
     meta: { requiresAuth: true, requiresAdmin: true },
   },
 

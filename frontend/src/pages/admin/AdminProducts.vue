@@ -86,7 +86,7 @@
                 </td>
                 <td class="py-3 px-4">
                   <span class="text-xs bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full font-medium">
-                    {{ product.category }}
+                    {{ product.category || '—' }}
                   </span>
                 </td>
                 <td class="py-3 px-4 font-semibold text-neutral-800">{{ formatPrice(product.price) }}</td>
@@ -151,11 +151,15 @@
       </div>
       <div class="flex flex-col gap-1.5">
         <label class="text-sm font-medium text-neutral-700">Kategori <span class="text-red-500">*</span></label>
-        <select v-model="form.category" class="input-field py-3 text-sm" :class="{ 'border-red-400': formErrors.category }">
+        <select
+          v-model="form.category_id"
+          class="input-field py-3 text-sm"
+          :class="{ 'border-red-400': formErrors.category_id }"
+        >
           <option value="">Pilih kategori</option>
-          <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+          <option v-for="cat in categories" :key="cat.id" :value="String(cat.id)">{{ cat.name }}</option>
         </select>
-        <p v-if="formErrors.category" class="text-xs text-red-500">{{ formErrors.category }}</p>
+        <p v-if="formErrors.category_id" class="text-xs text-red-500">{{ formErrors.category_id }}</p>
       </div>
       <BaseInput
         v-model="form.image_url"
@@ -201,48 +205,49 @@
 <script setup>
 import { ref, computed, reactive, onMounted } from 'vue'
 import { Plus, Search, Pencil, Trash2, ImageOff } from 'lucide-vue-next'
-import AdminSidebar  from '@/components/layout/AdminSidebar.vue'
-import BaseButton    from '@/components/ui/BaseButton.vue'
-import BaseInput     from '@/components/ui/BaseInput.vue'
-import BaseModal     from '@/components/ui/BaseModal.vue'
-import EmptyState    from '@/components/ui/EmptyState.vue'
-import adminService  from '@/services/admin.service'
-import productService from '@/services/product.service'
-import { useToast }  from '@/composables/useToast'
+import AdminSidebar    from '@/components/layout/AdminSidebar.vue'
+import BaseButton      from '@/components/ui/BaseButton.vue'
+import BaseInput       from '@/components/ui/BaseInput.vue'
+import BaseModal       from '@/components/ui/BaseModal.vue'
+import EmptyState      from '@/components/ui/EmptyState.vue'
+import adminService    from '@/services/admin.service'
+import productService  from '@/services/product.service'
+import categoryService from '@/services/category.service'
+import { useToast }    from '@/composables/useToast'
 
 const toast = useToast()
 
-const products     = ref([])
-const loading      = ref(false)
-const searchQuery  = ref('')
-const showModal    = ref(false)
+const products   = ref([])
+const categories = ref([])
+const loading    = ref(false)
+const searchQuery     = ref('')
+const showModal       = ref(false)
 const showDeleteModal = ref(false)
 const editingProduct  = ref(null)
 const deletingProduct = ref(null)
-const saving  = ref(false)
+const saving   = ref(false)
 const deleting = ref(false)
 const formError = ref('')
 
-const categories = ['Electronics', 'Fashion', 'Lifestyle', 'Home', 'Sports', 'Books', 'Beauty', 'Gaming']
-
 const form = reactive({
-  name: '', price: '', stock: '', category: '', image_url: '', description: '',
+  name: '', price: '', stock: '', category_id: '', image_url: '', description: '',
 })
 
 const formErrors = reactive({
-  name: '', price: '', stock: '', category: '', image_url: '',
+  name: '', price: '', stock: '', category_id: '', image_url: '',
 })
 
 const filteredProducts = computed(() => {
   if (!searchQuery.value) return products.value
   const q = searchQuery.value.toLowerCase()
-  return products.value.filter((p) => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q))
+  return products.value.filter(
+    (p) => p.name.toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q)
+  )
 })
 
 async function fetchProducts() {
   loading.value = true
   try {
-    // Backend caps limit at 100, fetch all pages to get complete list
     const firstRes = await productService.getAll({ limit: 100, page: 1 })
     const total    = firstRes.meta?.total ?? firstRes.data?.length ?? 0
     let   all      = firstRes.data || []
@@ -256,16 +261,24 @@ async function fetchProducts() {
       const results = await Promise.all(requests)
       results.forEach((r) => { all = all.concat(r.data || []) })
     }
-
     products.value = all
   } finally {
     loading.value = false
   }
 }
 
+async function fetchCategories() {
+  try {
+    const res = await categoryService.getAll()
+    categories.value = res.data || []
+  } catch {
+    categories.value = []
+  }
+}
+
 function openCreateModal() {
   editingProduct.value = null
-  Object.assign(form, { name: '', price: '', stock: '', category: '', image_url: '', description: '' })
+  Object.assign(form, { name: '', price: '', stock: '', category_id: '', image_url: '', description: '' })
   Object.keys(formErrors).forEach((k) => (formErrors[k] = ''))
   formError.value = ''
   showModal.value = true
@@ -277,7 +290,7 @@ function openEditModal(product) {
     name:        product.name,
     price:       String(product.price),
     stock:       String(product.stock),
-    category:    product.category,
+    category_id: product.category_id ? String(product.category_id) : '',
     image_url:   product.image_url || '',
     description: product.description || '',
   })
@@ -289,10 +302,10 @@ function openEditModal(product) {
 function validateForm() {
   Object.keys(formErrors).forEach((k) => (formErrors[k] = ''))
   let valid = true
-  if (!form.name.trim())                             { formErrors.name     = 'Nama wajib diisi.';     valid = false }
-  if (!form.price || Number(form.price) <= 0)        { formErrors.price    = 'Harga tidak valid.';    valid = false }
-  if (form.stock === '' || Number(form.stock) < 0)   { formErrors.stock    = 'Stok tidak valid.';     valid = false }
-  if (!form.category)                                { formErrors.category = 'Pilih kategori.';       valid = false }
+  if (!form.name.trim())                           { formErrors.name        = 'Nama wajib diisi.';   valid = false }
+  if (!form.price || Number(form.price) <= 0)      { formErrors.price       = 'Harga tidak valid.';  valid = false }
+  if (form.stock === '' || Number(form.stock) < 0) { formErrors.stock       = 'Stok tidak valid.';   valid = false }
+  if (!form.category_id)                           { formErrors.category_id = 'Pilih kategori.';     valid = false }
   return valid
 }
 
@@ -304,7 +317,7 @@ async function handleSave() {
     name:        form.name.trim(),
     price:       Number(form.price),
     stock:       Number(form.stock),
-    category:    form.category,
+    category_id: Number(form.category_id),
     image_url:   form.image_url.trim() || '',
     description: form.description.trim() || '',
   }
@@ -348,5 +361,8 @@ function formatPrice(price) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(price)
 }
 
-onMounted(fetchProducts)
+onMounted(() => {
+  fetchProducts()
+  fetchCategories()
+})
 </script>

@@ -51,16 +51,17 @@
 
 <script setup>
 import { useRoute } from 'vue-router'
-import { LayoutDashboard, Package, ClipboardList, Store, LogOut } from 'lucide-vue-next'
+import { LayoutDashboard, Package, ClipboardList, Tag, Store, LogOut } from 'lucide-vue-next'
 import { useAuth } from '@/composables/useAuth'
 
 const route       = useRoute()
 const { logout }  = useAuth()
 
 const navItems = [
-  { to: '/admin',          label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/admin/products', label: 'Produk',    icon: Package },
-  { to: '/admin/orders',   label: 'Pesanan',   icon: ClipboardList },
+  { to: '/admin',            label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/admin/products',   label: 'Produk',    icon: Package },
+  { to: '/admin/categories', label: 'Kategori',  icon: Tag },
+  { to: '/admin/orders',     label: 'Pesanan',   icon: ClipboardList },
 ]
 
 function isActive(path) {

@@ -28,13 +28,13 @@ func (r *repository) FindAll(search, category string, page, limit int) ([]models
 		query = query.Where("name LIKE ? OR description LIKE ?", "%"+search+"%", "%"+search+"%")
 	}
 	if category != "" {
-		query = query.Where("category = ?", category)
+		query = query.Joins("JOIN categories ON categories.id = products.category_id").Where("categories.name = ?", category)
 	}
 
 	query.Count(&total)
 
 	offset := (page - 1) * limit
-	if err := query.Offset(offset).Limit(limit).Find(&products).Error; err != nil {
+	if err := query.Preload("Category").Offset(offset).Limit(limit).Find(&products).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -43,7 +43,7 @@ func (r *repository) FindAll(search, category string, page, limit int) ([]models
 
 func (r *repository) FindByID(id uint) (*models.Product, error) {
 	var product models.Product
-	if err := r.db.First(&product, id).Error; err != nil {
+	if err := r.db.Preload("Category").First(&product, id).Error; err != nil {
 		return nil, err
 	}
 	return &product, nil

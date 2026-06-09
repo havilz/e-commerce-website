@@ -38,13 +38,26 @@ definitions:
         type: string
       total_price:
         type: number
+      user:
+        $ref: '#/definitions/admin.AdminOrderUser'
       user_id:
         type: integer
+    type: object
+  admin.AdminOrderUser:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
     type: object
   admin.AdminProductRequest:
     properties:
       category:
         type: string
+      category_id:
+        type: integer
       description:
         type: string
       image_url:
@@ -60,6 +73,8 @@ definitions:
     properties:
       category:
         type: string
+      category_id:
+        type: integer
       description:
         type: string
       id:
@@ -168,6 +183,27 @@ definitions:
       quantity:
         type: integer
     type: object
+  category.CategoryResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  category.CreateCategoryRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  category.UpdateCategoryRequest:
+    properties:
+      name:
+        type: string
+    type: object
   order.CheckoutRequest:
     properties:
       address:
@@ -218,6 +254,8 @@ definitions:
     properties:
       category:
         type: string
+      category_id:
+        type: integer
       description:
         type: string
       id:
@@ -272,6 +310,133 @@ info:
   title: E-Commerce API
   version: "1.0"
 paths:
+  /admin/categories:
+    post:
+      consumes:
+      - application/json
+      description: Add a new category (Admin Only)
+      parameters:
+      - description: Create Category Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/category.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/category.CategoryResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new category
+      tags:
+      - admin
+  /admin/categories/{id}:
+    delete:
+      description: Delete a category (Admin Only)
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a category
+      tags:
+      - admin
+    put:
+      consumes:
+      - application/json
+      description: Update details of an existing category (Admin Only)
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Category Payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/category.UpdateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/category.CategoryResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a category
+      tags:
+      - admin
   /admin/orders:
     get:
       description: Retrieve a paginated list of all customer orders in the system
@@ -724,6 +889,62 @@ paths:
       summary: Update cart item quantity
       tags:
       - cart
+  /categories:
+    get:
+      description: Retrieve a list of all product categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.JSONResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/category.CategoryResponse'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      summary: Get all categories
+      tags:
+      - categories
+  /categories/{id}:
+    get:
+      description: Retrieve a single category by its unique database ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/category.CategoryResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      summary: Get category by ID
+      tags:
+      - categories
   /orders:
     get:
       description: Retrieve the order purchase history of the authenticated user
