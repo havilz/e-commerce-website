@@ -71,15 +71,15 @@ const { products, loading, fetchAll, filterByCategory: filterByCat, filters } = 
 const activeCategory = ref('')
 
 const categories = [
-  { value: '',           emoji: '🛒', label: 'Semua' },
-  { value: 'Electronics',emoji: '📱', label: 'Electronics' },
-  { value: 'Fashion',    emoji: '👗', label: 'Fashion' },
-  { value: 'Lifestyle',  emoji: '✨', label: 'Lifestyle' },
-  { value: 'Home',       emoji: '🏠', label: 'Home' },
-  { value: 'Sports',     emoji: '⚽', label: 'Sports' },
-  { value: 'Books',      emoji: '📚', label: 'Books' },
-  { value: 'Beauty',     emoji: '💄', label: 'Beauty' },
-  { value: 'Gaming',     emoji: '🎮', label: 'Gaming' },
+  { value: '', label: 'Semua' },
+  { value: 'Electronics',label: 'Electronics' },
+  { value: 'Fashion',    label: 'Fashion' },
+  { value: 'Lifestyle',  label: 'Lifestyle' },
+  { value: 'Home',       label: 'Home' },
+  { value: 'Sports',     label: 'Sports' },
+  { value: 'Books',      label: 'Books' },
+  { value: 'Beauty',     label: 'Beauty' },
+  { value: 'Gaming',     label: 'Gaming' },
 ]
 
 function filterByCategory(val) {
