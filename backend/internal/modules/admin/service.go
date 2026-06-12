@@ -34,13 +34,33 @@ func (s *service) CreateProduct(req AdminProductRequest) (*AdminProductResponse,
 		return nil, errors.New("name and a positive price are required")
 	}
 
+	var categoryID uint
+	var catName string
+	if req.CategoryID > 0 {
+		cat, err := s.repo.FindCategoryByID(req.CategoryID)
+		if err != nil {
+			return nil, errors.New("category not found")
+		}
+		categoryID = cat.ID
+		catName = cat.Name
+	} else if req.Category != "" {
+		cat, err := s.repo.FindCategoryByName(req.Category)
+		if err != nil {
+			return nil, errors.New("category '" + req.Category + "' not found. Admin must create this category first")
+		}
+		categoryID = cat.ID
+		catName = cat.Name
+	} else {
+		return nil, errors.New("category is required")
+	}
+
 	p := &models.Product{
 		Name:        req.Name,
 		Description: req.Description,
 		Price:       req.Price,
 		Stock:       req.Stock,
 		ImageURL:    req.ImageURL,
-		Category:    req.Category,
+		CategoryID:  categoryID,
 	}
 
 	if err := s.repo.CreateProduct(p); err != nil {
@@ -54,18 +74,36 @@ func (s *service) CreateProduct(req AdminProductRequest) (*AdminProductResponse,
 		Price:       p.Price,
 		Stock:       p.Stock,
 		ImageURL:    p.ImageURL,
-		Category:    p.Category,
+		CategoryID:  p.CategoryID,
+		Category:    catName,
 	}, nil
 }
 
 func (s *service) UpdateProduct(id uint, req AdminProductRequest) error {
+	var categoryID uint
+	if req.CategoryID > 0 {
+		cat, err := s.repo.FindCategoryByID(req.CategoryID)
+		if err != nil {
+			return errors.New("category not found")
+		}
+		categoryID = cat.ID
+	} else if req.Category != "" {
+		cat, err := s.repo.FindCategoryByName(req.Category)
+		if err != nil {
+			return errors.New("category '" + req.Category + "' not found. Admin must create this category first")
+		}
+		categoryID = cat.ID
+	} else {
+		return errors.New("category is required")
+	}
+
 	data := map[string]interface{}{
 		"name":        req.Name,
 		"description": req.Description,
 		"price":       req.Price,
 		"stock":       req.Stock,
 		"image_url":   req.ImageURL,
-		"category":    req.Category,
+		"category_id": categoryID,
 	}
 	return s.repo.UpdateProduct(id, data)
 }

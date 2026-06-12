@@ -37,7 +37,8 @@ func (s *service) GetAll(search, category string, page, limit int) ([]ProductRes
 			Price:       p.Price,
 			Stock:       p.Stock,
 			ImageURL:    p.ImageURL,
-			Category:    p.Category,
+			CategoryID:  p.CategoryID,
+			Category:    p.Category.Name,
 		})
 	}
 	return result, total, nil
@@ -55,6 +56,7 @@ func (s *service) GetByID(id uint) (*ProductResponse, error) {
 		Price:       p.Price,
 		Stock:       p.Stock,
 		ImageURL:    p.ImageURL,
-		Category:    p.Category,
+		CategoryID:  p.CategoryID,
+		Category:    p.Category.Name,
 	}, nil
 }

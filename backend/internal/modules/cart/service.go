@@ -41,7 +41,7 @@ func (s *service) GetCart(userID uint) (*CartResponse, error) {
 				Price:    item.Product.Price,
 				Stock:    item.Product.Stock,
 				ImageURL: item.Product.ImageURL,
-				Category: item.Product.Category,
+				Category: item.Product.Category.Name,
 			},
 			Quantity: item.Quantity,
 		})

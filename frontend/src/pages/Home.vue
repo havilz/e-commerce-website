@@ -26,7 +26,7 @@
       <div class="flex flex-wrap gap-2">
         <button
           v-for="cat in categories"
-          :key="cat.value"
+          :key="cat.id"
           @click="filterByCategory(cat.value)"
           :class="[
             'px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border',
@@ -35,7 +35,7 @@
               : 'bg-white text-neutral-600 border-neutral-200 hover:border-primary-300 hover:text-primary-600'
           ]"
         >
-          {{ cat.emoji }} {{ cat.label }}
+          {{ cat.name }}
         </button>
       </div>
     </section>
@@ -64,23 +64,13 @@
 import { ref, onMounted } from 'vue'
 import { ChevronRight } from 'lucide-vue-next'
 import { useProducts } from '@/composables/useProducts'
-import ProductGrid from '@/components/product/ProductGrid.vue'
-import BaseButton  from '@/components/ui/BaseButton.vue'
+import ProductGrid     from '@/components/product/ProductGrid.vue'
+import BaseButton      from '@/components/ui/BaseButton.vue'
+import categoryService from '@/services/category.service'
 
 const { products, loading, fetchAll, filterByCategory: filterByCat, filters } = useProducts()
 const activeCategory = ref('')
-
-const categories = [
-  { value: '', label: 'Semua' },
-  { value: 'Electronics',label: 'Electronics' },
-  { value: 'Fashion',    label: 'Fashion' },
-  { value: 'Lifestyle',  label: 'Lifestyle' },
-  { value: 'Home',       label: 'Home' },
-  { value: 'Sports',     label: 'Sports' },
-  { value: 'Books',      label: 'Books' },
-  { value: 'Beauty',     label: 'Beauty' },
-  { value: 'Gaming',     label: 'Gaming' },
-]
+const categories     = ref([])
 
 function filterByCategory(val) {
   activeCategory.value = val
@@ -93,5 +83,15 @@ function clearFilter() {
   filterByCat('')
 }
 
-onMounted(() => fetchAll({ limit: 8 }))
+onMounted(async () => {
+  fetchAll({ limit: 8 })
+  try {
+    const res    = await categoryService.getAll()
+    const list   = res.data || []
+    // Tambahkan opsi "Semua" di awal
+    categories.value = [{ id: 0, name: 'Semua', value: '' }, ...list.map((c) => ({ ...c, value: c.name }))]
+  } catch {
+    categories.value = [{ id: 0, name: 'Semua', value: '' }]
+  }
+})
 </script>

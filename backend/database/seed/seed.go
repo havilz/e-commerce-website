@@ -18,6 +18,7 @@ func Seed() {
 	log.Println("[seed] starting database seeding...")
 	SeedAdmin(db)
 	SeedUser(db)
-	SeedProducts(db)
+	cats := SeedCategories(db)
+	SeedProducts(db, cats)
 	log.Println("[seed] database seeding completed successfully!")
 }

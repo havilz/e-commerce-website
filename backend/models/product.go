@@ -9,7 +9,9 @@ type Product struct {
 	Price float64 `gorm:"type:decimal(10,2);not null" json:"price"`
 	Stock int `gorm:"not null;default:0" json:"stock"`
 	ImageURL string `gorm:"type:varchar(500)" json:"image_url"`
-	Category string `gorm:"type:varchar(100)" json:"category"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CategoryID  uint      `json:"category_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+
+	Category    Category  `gorm:"foreignkey:CategoryID" json:"category"`
 }

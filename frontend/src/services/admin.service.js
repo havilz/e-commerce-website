@@ -1,6 +1,39 @@
 import api from './api'
 
 const adminService = {
+  // Category CRUD
+
+  /**
+   * Buat kategori baru
+   * @param {object} payload - { name }
+   * @returns {Promise}
+   */
+  async createCategory(payload) {
+    const { data } = await api.post('/admin/categories', payload)
+    return data
+  },
+
+  /**
+   * Update kategori
+   * @param {number} id
+   * @param {object} payload - { name }
+   * @returns {Promise}
+   */
+  async updateCategory(id, payload) {
+    const { data } = await api.put(`/admin/categories/${id}`, payload)
+    return data
+  },
+
+  /**
+   * Hapus kategori
+   * @param {number} id
+   * @returns {Promise}
+   */
+  async deleteCategory(id) {
+    const { data } = await api.delete(`/admin/categories/${id}`)
+    return data
+  },
+
   // Product CRUD
 
   /**
