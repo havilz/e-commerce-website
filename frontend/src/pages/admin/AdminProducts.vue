@@ -306,6 +306,14 @@ function validateForm() {
   if (!form.price || Number(form.price) <= 0)      { formErrors.price       = 'Harga tidak valid.';  valid = false }
   if (form.stock === '' || Number(form.stock) < 0) { formErrors.stock       = 'Stok tidak valid.';   valid = false }
   if (!form.category_id)                           { formErrors.category_id = 'Pilih kategori.';     valid = false }
+  
+  if (form.image_url.trim()) {
+    const lowerURL = form.image_url.trim().toLowerCase()
+    if (!lowerURL.startsWith('http://') && !lowerURL.startsWith('https://')) {
+      formErrors.image_url = 'URL Gambar harus diawali dengan http:// atau https://';
+      valid = false
+    }
+  }
   return valid
 }
 

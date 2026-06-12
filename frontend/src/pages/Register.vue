@@ -100,7 +100,7 @@ function validate() {
   }
   if (!form.email) {
     errors.email = 'Email wajib diisi.'; valid = false
-  } else if (!/\S+@\S+\.\S+/.test(form.email)) {
+  } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email)) {
     errors.email = 'Format email tidak valid.'; valid = false
   }
   if (!form.password) {
