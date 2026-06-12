@@ -157,3 +157,12 @@
 - [x] [60] Amankan query pencarian produk dengan SQL wildcard escape
 - [x] [61] Tulis unit test untuk verifikasi fungsionalitas security
 
+---
+
+## FASE 13 — FRONTEND SECURITY UPDATES
+
+- [x] [62] Tambah interceptor HTTP 429 global dengan notifikasi Toast di `src/services/api.js`
+- [x] [63] Sinkronisasi regex format email registrasi di `src/pages/Register.vue`
+- [x] [64] Validasi skema protocol HTTP/HTTPS URL gambar produk di `src/pages/admin/AdminProducts.vue`
+
+

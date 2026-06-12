@@ -14,7 +14,7 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Handle 401 → auto logout
+// Handle 401 → auto logout, 429 → rate limit toast
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -24,6 +24,21 @@ api.interceptors.response.use(
       // Redirect to login if not already there
       if (window.location.pathname !== '/login') {
         window.location.href = '/login'
+      }
+    } else if (error.response?.status === 429) {
+      // Import and trigger toast on the fly for 429 errors
+      try {
+        const { useToast } = require('vue-toastification')
+        const toast = useToast()
+        toast.error('Terlalu banyak permintaan (Rate Limit). Silakan coba lagi nanti.')
+      } catch (e) {
+        // Fallback if dynamic require fails (ESM environment)
+        import('vue-toastification').then(({ useToast }) => {
+          const toast = useToast()
+          toast.error('Terlalu banyak permintaan (Rate Limit). Silakan coba lagi nanti.')
+        }).catch(() => {
+          console.warn('Toast failed to load for 429 error')
+        })
       }
     }
     return Promise.reject(error)
