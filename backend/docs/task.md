@@ -143,3 +143,17 @@
 
 - [ ] [52] Update Swagger docs jika ada perubahan response (429)
 - [ ] [53] Test end-to-end semua endpoint setelah update
+
+---
+
+## FASE 12 — SECURITY ENHANCEMENTS
+
+- [x] [54] Tambah dependency `bluemonday` untuk sanitasi HTML/XSS
+- [x] [55] Buat package utility `pkg/security` (sanitasi teks & SQL wildcard escape)
+- [x] [56] Terapkan sanitasi input pada registrasi user (Auth Module) & regex email
+- [x] [57] Terapkan sanitasi input & validasi skema ImageURL pada produk (Admin Module)
+- [x] [58] Terapkan sanitasi input pada nama kategori (Category Module)
+- [x] [59] Terapkan sanitasi input pada alamat checkout (Order Module)
+- [x] [60] Amankan query pencarian produk dengan SQL wildcard escape
+- [x] [61] Tulis unit test untuk verifikasi fungsionalitas security
+

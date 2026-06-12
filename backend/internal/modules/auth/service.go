@@ -3,12 +3,16 @@ package auth
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/havilz/ecommerce-backend/models"
+	"github.com/havilz/ecommerce-backend/pkg/security"
 	"golang.org/x/crypto/bcrypt"
 )
+
+var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 
 type Service interface {
 	Register(req RegisterRequest) (*AuthResponse, error)
@@ -31,9 +35,18 @@ func NewService(repo Repository, jwtSecret string, expiryHours int) Service {
 }
 
 func (s *service) Register(req RegisterRequest) (*AuthResponse, error) {
+	// Sanitize text inputs to strip out HTML/JS tags
+	req.Name = security.SanitizeString(req.Name)
+	req.Email = security.SanitizeString(req.Email)
+
 	if req.Name == "" || req.Email == "" || req.Password == "" {
 		return nil, errors.New("name, email, and password are required")
 	}
+
+	if !emailRegex.MatchString(req.Email) {
+		return nil, errors.New("invalid email format")
+	}
+
 	if len(req.Password) < 6 {
 		return nil, errors.New("password must be at least 6 characters")
 	}
