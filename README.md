@@ -45,6 +45,9 @@ e-commerce-website/
 ## Backend (Go + GORM + SQLite)
 
 <div align="center">
+  <img src="https://golang.org/doc/gopher/fiveyears.jpg" alt="Go Gophers" width="280" />
+  <br />
+  <br />
 
   ![Go](https://img.shields.io/badge/Go_1.26-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white)
   ![GORM](https://img.shields.io/badge/GORM-F16822.svg?style=for-the-badge&logo=gorm&logoColor=white)
@@ -172,6 +175,9 @@ HTTP Request
 ## Frontend (Vue 3 + Vite + Tailwind)
 
 <div align="center">
+  <img src="https://vuejs.org/images/logo.png" alt="Vue.js Logo" width="80" />
+  <br />
+  <br />
 
   ![Vue 3](https://img.shields.io/badge/Vue_3-%234FC08D.svg?style=for-the-badge&logo=vuedotjs&logoColor=white)
   ![Vite](https://img.shields.io/badge/Vite_5-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)
