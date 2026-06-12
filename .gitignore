@@ -1,0 +1,39 @@
+# ============================================================
+# Environment Variables
+# ============================================================
+# Ignore all .env files at any depth (frontend & backend)
+**/.env
+**/.env.*
+.env
+.env.*
+
+# ============================================================
+# Docs Folders
+# ============================================================
+# Ignore all docs folders recursively...
+**/docs/
+
+# ...but keep swagger-related files inside backend/docs
+!backend/docs/
+!backend/docs/docs.go
+!backend/docs/swagger.json
+!backend/docs/swagger.yaml
+
+# ============================================================
+# Dependencies
+# ============================================================
+node_modules/
+
+# ============================================================
+# Build Outputs
+# ============================================================
+dist/
+build/
+
+# ============================================================
+# OS & Editor
+# ============================================================
+.DS_Store
+Thumbs.db
+*.log
+.vscode/settings.json
