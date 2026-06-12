@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/havilz/ecommerce-backend/models"
+	"github.com/havilz/ecommerce-backend/pkg/security"
 )
 
 type Service interface {
@@ -25,6 +26,7 @@ func NewService(repo Repository) Service {
 
 func (s *service) Create(req CreateCategoryRequest) (*CategoryResponse, error) {
 	name := strings.TrimSpace(req.Name)
+	name = security.SanitizeString(name)
 	if name == "" {
 		return nil, errors.New("category name is required")
 	}
@@ -50,6 +52,7 @@ func (s *service) Create(req CreateCategoryRequest) (*CategoryResponse, error) {
 
 func (s *service) Update(id uint, req UpdateCategoryRequest) (*CategoryResponse, error) {
 	name := strings.TrimSpace(req.Name)
+	name = security.SanitizeString(name)
 	if name == "" {
 		return nil, errors.New("category name is required")
 	}

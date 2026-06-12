@@ -2,8 +2,10 @@ package admin
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/havilz/ecommerce-backend/models"
+	"github.com/havilz/ecommerce-backend/pkg/security"
 )
 
 var validStatuses = map[string]bool{
@@ -30,8 +32,21 @@ func NewService(repo Repository) Service {
 }
 
 func (s *service) CreateProduct(req AdminProductRequest) (*AdminProductResponse, error) {
+	// Sanitize text fields
+	req.Name = security.SanitizeString(req.Name)
+	req.Description = security.SanitizeString(req.Description)
+	req.ImageURL = strings.TrimSpace(req.ImageURL)
+
 	if req.Name == "" || req.Price <= 0 {
 		return nil, errors.New("name and a positive price are required")
+	}
+
+	// Validate ImageURL scheme if provided to prevent URI-based XSS (e.g. javascript:...)
+	if req.ImageURL != "" {
+		lowerURL := strings.ToLower(req.ImageURL)
+		if !strings.HasPrefix(lowerURL, "http://") && !strings.HasPrefix(lowerURL, "https://") {
+			return nil, errors.New("image_url must start with http:// or https://")
+		}
 	}
 
 	var categoryID uint
@@ -80,6 +95,23 @@ func (s *service) CreateProduct(req AdminProductRequest) (*AdminProductResponse,
 }
 
 func (s *service) UpdateProduct(id uint, req AdminProductRequest) error {
+	// Sanitize text fields
+	req.Name = security.SanitizeString(req.Name)
+	req.Description = security.SanitizeString(req.Description)
+	req.ImageURL = strings.TrimSpace(req.ImageURL)
+
+	if req.Name == "" || req.Price <= 0 {
+		return errors.New("name and a positive price are required")
+	}
+
+	// Validate ImageURL scheme if provided to prevent URI-based XSS (e.g. javascript:...)
+	if req.ImageURL != "" {
+		lowerURL := strings.ToLower(req.ImageURL)
+		if !strings.HasPrefix(lowerURL, "http://") && !strings.HasPrefix(lowerURL, "https://") {
+			return errors.New("image_url must start with http:// or https://")
+		}
+	}
+
 	var categoryID uint
 	if req.CategoryID > 0 {
 		cat, err := s.repo.FindCategoryByID(req.CategoryID)

@@ -2,6 +2,7 @@ package product
 
 import (
 	"github.com/havilz/ecommerce-backend/models"
+	"github.com/havilz/ecommerce-backend/pkg/security"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +26,9 @@ func (r *repository) FindAll(search, category string, page, limit int) ([]models
 	query := r.db.Model(&models.Product{})
 
 	if search != "" {
-		query = query.Where("name LIKE ? OR description LIKE ?", "%"+search+"%", "%"+search+"%")
+		escapedSearch := security.SanitizeSQLWildcards(search)
+		// SQLite standard escape syntax is ESCAPE '\'
+		query = query.Where("name LIKE ? ESCAPE '\\' OR description LIKE ? ESCAPE '\\'", "%"+escapedSearch+"%", "%"+escapedSearch+"%")
 	}
 	if category != "" {
 		query = query.Joins("JOIN categories ON categories.id = products.category_id").Where("categories.name = ?", category)

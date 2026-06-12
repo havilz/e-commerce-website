@@ -6,6 +6,7 @@ import (
 	cartRepo "github.com/havilz/ecommerce-backend/internal/modules/cart"
 	productRepo "github.com/havilz/ecommerce-backend/internal/modules/product"
 	"github.com/havilz/ecommerce-backend/models"
+	"github.com/havilz/ecommerce-backend/pkg/security"
 	"gorm.io/gorm"
 )
 
@@ -37,6 +38,7 @@ func NewService(
 }
 
 func (s *service) Checkout(userID uint, req CheckoutRequest) (*OrderResponse, error) {
+	req.Address = security.SanitizeString(req.Address)
 	if req.Address == "" {
 		return nil, errors.New("address is required")
 	}

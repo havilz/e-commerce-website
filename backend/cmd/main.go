@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/havilz/ecommerce-backend/config"
 	adminModule "github.com/havilz/ecommerce-backend/internal/modules/admin"
@@ -70,6 +71,15 @@ func main() {
 	orderHandler := orderModule.NewHandler(orderSvc)
 	adminHandler := adminModule.NewHandler(adminSvc)
 
+	// Rate Limiters (per-IP, in-memory)
+	authLimiter := middleware.NewRateLimiter(5, 1*time.Minute)       // 5 req/min — brute-force protection
+	checkoutLimiter := middleware.NewRateLimiter(10, 1*time.Minute)  // 10 req/min — prevent duplicate orders
+	orderLimiter := middleware.NewRateLimiter(30, 1*time.Minute)     // 30 req/min
+	cartLimiter := middleware.NewRateLimiter(30, 1*time.Minute)      // 30 req/min
+	adminLimiter := middleware.NewRateLimiter(30, 1*time.Minute)     // 30 req/min
+	productLimiter := middleware.NewRateLimiter(60, 1*time.Minute)   // 60 req/min — relaxed for browsing
+	categoryLimiter := middleware.NewRateLimiter(60, 1*time.Minute)  // 60 req/min — relaxed for browsing
+
 	// Router
 	mux := http.NewServeMux()
 
@@ -93,43 +103,51 @@ func main() {
 		httpSwagger.URL("/swagger/doc.json"),
 	))
 
-	// Auth (public)
-	mux.HandleFunc("POST /api/v1/auth/register", authHandler.Register)
-	mux.HandleFunc("POST /api/v1/auth/login", authHandler.Login)
+	// Auth (public — rate limited: 5 req/min)
+	mux.Handle("POST /api/v1/auth/register",
+		authLimiter.LimitFunc(authHandler.Register))
+	mux.Handle("POST /api/v1/auth/login",
+		authLimiter.LimitFunc(authHandler.Login))
 	mux.Handle("GET /api/v1/auth/me",
-		middleware.JWTMiddleware(http.HandlerFunc(authHandler.Me)))
+		authLimiter.Limit(middleware.JWTMiddleware(http.HandlerFunc(authHandler.Me))))
 
-	// Products (public)
-	mux.HandleFunc("GET /api/v1/products", productHandler.GetAll)
-	mux.HandleFunc("GET /api/v1/products/{id}", productHandler.GetByID)
+	// Products (public — rate limited: 60 req/min)
+	mux.Handle("GET /api/v1/products",
+		productLimiter.LimitFunc(productHandler.GetAll))
+	mux.Handle("GET /api/v1/products/{id}",
+		productLimiter.LimitFunc(productHandler.GetByID))
 
-	// Cart (JWT protected)
+	// Cart (JWT protected — rate limited: 30 req/min)
 	mux.Handle("GET /api/v1/cart",
-		middleware.JWTMiddleware(http.HandlerFunc(cartHandler.GetCart)))
+		cartLimiter.Limit(middleware.JWTMiddleware(http.HandlerFunc(cartHandler.GetCart))))
 	mux.Handle("POST /api/v1/cart",
-		middleware.JWTMiddleware(http.HandlerFunc(cartHandler.AddItem)))
+		cartLimiter.Limit(middleware.JWTMiddleware(http.HandlerFunc(cartHandler.AddItem))))
 	mux.Handle("PUT /api/v1/cart/{id}",
-		middleware.JWTMiddleware(http.HandlerFunc(cartHandler.UpdateItem)))
+		cartLimiter.Limit(middleware.JWTMiddleware(http.HandlerFunc(cartHandler.UpdateItem))))
 	mux.Handle("DELETE /api/v1/cart/{id}",
-		middleware.JWTMiddleware(http.HandlerFunc(cartHandler.RemoveItem)))
+		cartLimiter.Limit(middleware.JWTMiddleware(http.HandlerFunc(cartHandler.RemoveItem))))
 	mux.Handle("DELETE /api/v1/cart",
-		middleware.JWTMiddleware(http.HandlerFunc(cartHandler.ClearCart)))
+		cartLimiter.Limit(middleware.JWTMiddleware(http.HandlerFunc(cartHandler.ClearCart))))
 
-	// Orders (JWT protected)
+	// Checkout (JWT protected — rate limited: 10 req/min)
 	mux.Handle("POST /api/v1/orders/checkout",
-		middleware.JWTMiddleware(http.HandlerFunc(orderHandler.Checkout)))
+		checkoutLimiter.Limit(middleware.JWTMiddleware(http.HandlerFunc(orderHandler.Checkout))))
+
+	// Orders (JWT protected — rate limited: 30 req/min)
 	mux.Handle("GET /api/v1/orders",
-		middleware.JWTMiddleware(http.HandlerFunc(orderHandler.GetOrders)))
+		orderLimiter.Limit(middleware.JWTMiddleware(http.HandlerFunc(orderHandler.GetOrders))))
 	mux.Handle("GET /api/v1/orders/{id}",
-		middleware.JWTMiddleware(http.HandlerFunc(orderHandler.GetOrderByID)))
+		orderLimiter.Limit(middleware.JWTMiddleware(http.HandlerFunc(orderHandler.GetOrderByID))))
 
-	// Categories (public)
-	mux.HandleFunc("GET /api/v1/categories", categoryHandler.GetAll)
-	mux.HandleFunc("GET /api/v1/categories/{id}", categoryHandler.GetByID)
+	// Categories (public — rate limited: 60 req/min)
+	mux.Handle("GET /api/v1/categories",
+		categoryLimiter.LimitFunc(categoryHandler.GetAll))
+	mux.Handle("GET /api/v1/categories/{id}",
+		categoryLimiter.LimitFunc(categoryHandler.GetByID))
 
-	// Admin (JWT + AdminOnly)
+	// Admin (JWT + AdminOnly — rate limited: 30 req/min)
 	adminMW := func(h http.Handler) http.Handler {
-		return middleware.JWTMiddleware(middleware.AdminOnly(h))
+		return adminLimiter.Limit(middleware.JWTMiddleware(middleware.AdminOnly(h)))
 	}
 	mux.Handle("POST /api/v1/admin/products",
 		adminMW(http.HandlerFunc(adminHandler.CreateProduct)))
@@ -142,7 +160,7 @@ func main() {
 	mux.Handle("PATCH /api/v1/admin/orders/{id}",
 		adminMW(http.HandlerFunc(adminHandler.UpdateOrderStatus)))
 
-	// Categories Admin (AdminOnly)
+	// Categories Admin (AdminOnly — rate limited via adminMW)
 	mux.Handle("POST /api/v1/admin/categories",
 		adminMW(http.HandlerFunc(categoryHandler.Create)))
 	mux.Handle("PUT /api/v1/admin/categories/{id}",
