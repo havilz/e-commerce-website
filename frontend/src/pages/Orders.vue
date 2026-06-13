@@ -1,6 +1,6 @@
 <template>
   <div class="container-page py-8">
-    <h1 class="font-heading font-bold text-2xl text-neutral-800 mb-6">📦 Pesanan Saya</h1>
+    <h1 class="font-heading font-bold text-2xl text-neutral-800 mb-6">Pesanan Saya</h1>
 
     <!-- Loading -->
     <div v-if="loading" class="space-y-4">

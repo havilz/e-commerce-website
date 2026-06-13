@@ -4,7 +4,6 @@
       <!-- Logo -->
       <div class="text-center mb-8">
         <RouterLink to="/" class="inline-flex items-center gap-2">
-          <span class="text-4xl">🛍️</span>
           <span class="font-heading font-extrabold text-3xl text-primary-600">ShopKu</span>
         </RouterLink>
         <p class="text-neutral-500 mt-2 text-sm">Masuk ke akun kamu</p>
@@ -12,7 +11,7 @@
 
       <!-- Card -->
       <div class="card p-8 animate-fade-in">
-        <h1 class="font-heading font-bold text-2xl text-neutral-800 mb-6">Selamat Datang 👋</h1>
+        <h1 class="font-heading font-bold text-2xl text-neutral-800 mb-6">Selamat Datang</h1>
 
         <form @submit.prevent="handleLogin" class="space-y-4" novalidate>
           <BaseInput

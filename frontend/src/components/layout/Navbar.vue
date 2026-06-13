@@ -4,7 +4,6 @@
       <div class="flex items-center h-16 gap-4">
         <!-- Logo -->
         <RouterLink to="/" class="flex items-center gap-2 flex-shrink-0">
-          <span class="text-2xl">🛍️</span>
           <span class="font-heading font-extrabold text-xl text-primary-600">ShopKu</span>
         </RouterLink>
 

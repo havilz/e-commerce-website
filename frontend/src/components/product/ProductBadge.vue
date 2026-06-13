@@ -19,7 +19,7 @@ const props = defineProps({
 })
 
 const label = computed(() => {
-  if (props.type === 'flash')    return '⚡ FLASH SALE'
+  if (props.type === 'flash')    return 'FLASH SALE'
   if (props.type === 'new')      return 'NEW'
   if (props.discount > 0)        return `-${props.discount}%`
   return ''

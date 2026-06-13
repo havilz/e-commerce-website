@@ -7,7 +7,7 @@
       <div class="flex items-center justify-between mb-8">
         <div>
           <h1 class="font-heading font-bold text-2xl text-neutral-800">Dashboard</h1>
-          <p class="text-sm text-neutral-400 mt-0.5">Selamat datang, {{ authStore.user?.name }} 👋</p>
+          <p class="text-sm text-neutral-400 mt-0.5">Selamat datang, {{ authStore.user?.name }}</p>
         </div>
         <span class="text-xs text-neutral-400">{{ today }}</span>
       </div>

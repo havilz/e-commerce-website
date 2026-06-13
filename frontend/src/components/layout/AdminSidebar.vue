@@ -3,7 +3,6 @@
     <!-- Logo -->
     <div class="h-16 flex items-center px-6 border-b border-neutral-700">
       <RouterLink to="/admin" class="flex items-center gap-2">
-        <span class="text-2xl">🛍️</span>
         <div>
           <span class="font-heading font-bold text-white text-sm block">ShopKu</span>
           <span class="text-xs text-neutral-400">Admin Panel</span>

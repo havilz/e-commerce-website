@@ -6,7 +6,7 @@
         <CheckCircle2 :size="48" class="text-green-500" />
       </div>
 
-      <h1 class="font-heading font-extrabold text-3xl text-neutral-800 mb-3">Pesanan Berhasil! 🎉</h1>
+      <h1 class="font-heading font-extrabold text-3xl text-neutral-800 mb-3">Pesanan Berhasil!</h1>
       <p class="text-neutral-500 mb-2">
         Terima kasih telah berbelanja di <strong class="text-primary-600">ShopKu</strong>.
       </p>

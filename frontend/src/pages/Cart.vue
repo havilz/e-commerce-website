@@ -1,7 +1,7 @@
 <template>
   <div class="container-page py-8">
     <h1 class="font-heading font-bold text-2xl text-neutral-800 mb-6">
-      🛒 Keranjang Belanja
+      Keranjang Belanja
       <span class="text-base text-neutral-400 font-normal ml-2">({{ cartStore.totalItems }} item)</span>
     </h1>
 

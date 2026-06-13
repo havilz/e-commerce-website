@@ -5,7 +5,7 @@
       <div class="container-page">
         <div class="max-w-xl">
           <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1 text-sm font-medium mb-4">
-            ⚡ FLASH SALE HARI INI
+            FLASH SALE HARI INI
           </div>
           <h1 class="font-heading font-extrabold text-4xl md:text-5xl mb-3 leading-tight">
             Diskon s/d 70%!
